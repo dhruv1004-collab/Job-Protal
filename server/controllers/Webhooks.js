@@ -1,40 +1,32 @@
-import { Webhook  } from "svix";
-import User from "../models/User.js";
-import connectDB from "../config/db.js";
+import { Webhook } from "svix";
+import User from "../models/User";
 
-// API Controller Function to Manage Clerk User with database
+// API Controller Function to Manage Clerk User with Database
 
-export const clerkWebhooks = async (req , res) =>{
+export const clerkWebhooks = async (req,res) =>{
     try {
-
-        await connectDB()
-
-        // Create a svix instance with clerk webhook secret.
+        // create a svix instance with clerk webhook secret
 
         const whook = new Webhook (process.env.CLERK_WEBHOOK_SECRET)
 
-        // Veriying Headers
-
-        const payload = req.rawBody || JSON.stringify(req.body)
-
-        await whook.verify(payload,{
-            'svix-id' : req.headers['svix-id'],
-            'svix-timestamp' : req.headers['svix-timestamp'],
-            'svix-signature' : req.headers['svix-signature']
+        // Verifying Headers
+        await whook.verify(JSON.stringify(req.body),{
+            "svix-id" : req.headers["svix-id"],
+            "svix-timestamp" : req.headers["svix-timestamp"],
+            "svix-signature": req.headers["svix-signature"]
         })
 
-        // Getting data from request body
+        // getting data from request body 
 
-        const {data ,type} = req.body
+        const {data,type} = req.body
 
-        // switch case for different event
+        // Switch case for different Events
 
         switch (type) {
             case 'user.created':{
-                
                 const userData = {
-                    clerkId : data.id , 
-                    email : data.email_addresses[0].email_address,
+                    _id : data.id,
+                    email: data.email_addresses[0].email_address,
                     name : data.first_name + " " + data.last_name,
                     image : data.image_url,
                     resume: ''
@@ -43,10 +35,9 @@ export const clerkWebhooks = async (req , res) =>{
                 res.json({})
                 break;
             }
-
             case 'user.updated':{
                 const userData = {
-                    email : data.email_addresses[0].email_address,
+                    email: data.email_addresses[0].email_address,
                     name : data.first_name + " " + data.last_name,
                     image : data.image_url,
                 }
@@ -59,12 +50,12 @@ export const clerkWebhooks = async (req , res) =>{
                 res.json({})
                 break;
             }
+        
             default:
                 break;
         }
-        
     } catch (error) {
-        console.log(error.message);
-        res.json({success : false , message : 'Webhooks Error'})
+        console.log(error.message)
+        res.json({success:false , message:'Webhooks Error'})
     }
 }

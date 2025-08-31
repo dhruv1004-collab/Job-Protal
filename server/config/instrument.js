@@ -1,10 +1,16 @@
-// Import with `import * as Sentry from "@sentry/node"` if you are using ESM
-import * as Sentry from "@sentry/node"
+import * as Sentry from "@sentry/node";
+import { nodeProfilingIntegration } from "@sentry/profiling-node";
 
 Sentry.init({
-  dsn: "https://b5a6442afb4e984b4a18c1e7a6071cfb@o4509908852998144.ingest.us.sentry.io/4509909029945344",
-  integrations: [Sentry.mongooseIntegration()],
-  // Setting this option to true will send default PII data to Sentry.
-  // For example, automatic IP address collection on events
-  sendDefaultPii: true,
+  dsn: "https://fc6422e28146fa73d5401daee2ad0697@o4509908852998144.ingest.us.sentry.io/4509938546835456",
+   integrations: [
+    nodeProfilingIntegration(),
+    Sentry.mongooseIntegration()
+  ],
+  // Enable performance monitoring
+//   tracesSampleRate: 1.0, // capture 100% of transactions (adjust for production)
+
+
+
 });
+Sentry.profiler.startProfiler();
